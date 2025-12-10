@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>N-Back (Gustav Only) 🪿</title>
+  <title>Gustav does the N-Back</title>
   <style>
     /* --- CSS STYLES --- */
     body {
@@ -106,7 +106,7 @@
       cursor: pointer;
     }
     
-    input[type="text"] { width: 140px; text-transform: uppercase; }
+    input[type="text"] { width: 180px; text-transform: uppercase; }
     input[type="number"] { width: 50px; }
     select { min-width: 80px; }
     input[type="range"] { width: 90px; accent-color: #60a5fa; cursor: pointer; }
@@ -142,21 +142,21 @@
       border-color: #fdba74;
     }
 
-    /* --- VOLUME --- */
-    #volume-control {
+    /* --- FLASH CONTROL (Replaced Volume) --- */
+    #flash-control {
         display: flex;
         flex-direction: column;
         align-items: center;
         margin-top: 5px;
     }
-    #volume-control label { font-size: 0.7rem; color: #555; margin-bottom: 2px; }
+    #flash-control label { font-size: 0.7rem; color: #555; margin-bottom: 2px; }
 
     /* --- MOBILE MATCH BUTTON --- */
     #mobile-match-area {
         width: 100%;
         display: flex;
         justify-content: center;
-        margin-top: 2px;
+        margin-top: 10px;
     }
     #match-btn {
         background: #fb923c; 
@@ -187,7 +187,7 @@
     #controls {
       display: flex;
       gap: 15px;
-      margin-top: 5px;
+      margin-top: 10px;
     }
 
     button.ctrl-btn {
@@ -226,8 +226,10 @@
 
     /* --- GUSTAV THE GOOSE --- */
     #gustav-wrapper {
-        margin-top: auto; 
-        padding-bottom: 15px;
+        /* FIX: Increased top margin to 40px to prevent overlap with Flash slider */
+        margin-top: 40px; 
+        
+        margin-bottom: 5px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -235,12 +237,7 @@
     }
     
     #gustav-img {
-        /* =================================== */
-        /* <--- ADJUST GUSTAV SIZE HERE --->  */
-        /* =================================== */
-        width: 100px;  
-        /* =================================== */
-        
+        width: 200px; 
         height: auto;
         transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         cursor: help; 
@@ -304,50 +301,38 @@
           <select id="speed-select">
             <option value="0.5">0.5 s (Turbo)</option>
             <option value="1.0">1.0 s (Fast)</option>
-            <option value="1.5">1.5 s</option>
+            <option value="1.5" selected>1.5 s</option>
             <option value="2.0">2.0 s</option>
-            <option value="2.5" selected>2.5 s (Normal)</option>
+            <option value="2.5">2.5 s (Normal)</option>
           </select>
         </div>
         
         <div class="setting-group">
           <label>Trials</label>
-          <input type="number" id="trials-setting" value="20" min="5" max="1000" step="5">
-        </div>
-
-        <div class="setting-group">
-          <label>Grid Size</label>
-          <input type="number" id="grid-size-setting" value="3" min="3" max="5">
+          <input type="number" id="trials-setting" value="75" min="5" max="1000" step="5">
         </div>
       </div>
 
       <div class="settings-row">
-         <div class="setting-group">
-          <label>Letters</label>
-          <input type="text" id="letters-setting" value="H, R, K, L, Q, S, J, F, M">
-        </div>
-        
         <div class="setting-group">
-           <label>Voice</label>
-           <select id="voice-select">
-             <option value="">Loading...</option>
-           </select>
+            <label>Grid Size</label>
+            <input type="number" id="grid-size-setting" value="3" min="3" max="5">
+        </div>
+
+        <div class="setting-group">
+          <label>Letters</label>
+          <input type="text" id="letters-setting" value="K, L, R, Q, Z, W, H, O, Y">
         </div>
       </div>
 
       <hr style="width:100%; border:0; border-top:1px solid #222; margin: 0;">
 
       <div class="settings-row">
-        <div class="setting-group">
-            <label>Flash Time</label>
-            <input type="range" id="flash-duration" min="20" max="1500" step="10" value="800">
-            <span class="val-display" id="val-flash">800 ms</span>
-        </div>
-
-        <div class="setting-group">
-          <label>Static %</label>
-          <input type="range" id="audio-static" min="0" max="100" step="5" value="0">
-          <span class="val-display" id="val-static">0%</span>
+         <div class="setting-group">
+           <label>Voice</label>
+           <select id="voice-select">
+             <option value="">Loading...</option>
+           </select>
         </div>
       </div>
     </div>
@@ -355,14 +340,20 @@
     <div id="status-bar">
       <div class="status-pill text-blue">Correct: <span id="score-correct">0</span></div>
       <div class="status-pill text-orange">Wrong: <span id="score-wrong">0</span></div>
-      <div class="status-pill" style="color:#e5e7eb">Trial: <span id="trial-count">0</span> / <span id="max-trials-display">20</span></div>
+      <div class="status-pill" style="color:#e5e7eb">Trial: <span id="trial-count">0</span> / <span id="max-trials-display">75</span></div>
     </div>
 
     <div id="grid"></div>
     
-    <div id="volume-control">
-        <label>Voice Volume</label>
-        <input type="range" id="voice-volume" min="0" max="1" step="0.1" value="1.0" style="width:100px;">
+    <div id="flash-control">
+        <label>Flash Time</label>
+        <input type="range" id="flash-duration" min="20" max="1500" step="10" value="800" style="width:120px;">
+        <span class="val-display" id="val-flash">800 ms</span>
+    </div>
+
+    <div id="gustav-wrapper">
+        <div class="honk-text" id="gustav-msg">Honk!</div>
+        <img src="gustav.png" id="gustav-img" alt="Gustav 🪿" title="Honk?">
     </div>
 
     <div id="mobile-match-area">
@@ -381,27 +372,19 @@
       Voice speed is automatically optimized.
     </div>
 
-    <div id="gustav-wrapper">
-        <div class="honk-text" id="gustav-msg">Honk!</div>
-        <img src="gustav.png" id="gustav-img" alt="Gustav 🪿" title="Honk?">
-    </div>
-
   </div>
 
   <script>
     /* ====== CONFIG ====== */
     let activeLetters = []; 
     let nValue = 2; 
-    let cycleTimeMs = 2500;
+    let cycleTimeMs = 1500; // Default matches HTML select
     let flashDurationMs = 800;
-    let noiseVolume = 0; 
-    let maxTrials = 20;
+    let maxTrials = 75; // Default matches HTML input
     let gridSize = 3;
     let calculatedVoiceRate = 1.0; 
 
     let voices = [];
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx = new AudioContext();
     const synth = window.speechSynthesis;
 
     /* ====== DOM ELEMENTS ====== */
@@ -414,19 +397,17 @@
     const stopBtn = document.getElementById('stop-btn');
     const lastResultEl = document.getElementById('last-result');
     const matchBtn = document.getElementById('match-btn'); 
-    const voiceVolInput = document.getElementById('voice-volume');
+    
+    // Flash Time (Moved)
+    const flashDurInput = document.getElementById('flash-duration');
+    const valFlash = document.getElementById('val-flash');
 
     const nInput = document.getElementById('n-setting');
     const speedSelect = document.getElementById('speed-select');
     const trialsInput = document.getElementById('trials-setting');
     const gridInput = document.getElementById('grid-size-setting'); 
     const lettersInput = document.getElementById('letters-setting');
-    const flashDurInput = document.getElementById('flash-duration');
-    const staticInput = document.getElementById('audio-static');
     const voiceSelect = document.getElementById('voice-select');
-    
-    const valFlash = document.getElementById('val-flash');
-    const valStatic = document.getElementById('val-static');
     
     // Gustav
     const gustavImg = document.getElementById('gustav-img');
@@ -466,7 +447,6 @@
     /* ====== UI HANDLERS ====== */
     trialsInput.oninput = () => maxTrialsEl.textContent = trialsInput.value;
     flashDurInput.oninput = () => valFlash.textContent = flashDurInput.value + " ms";
-    staticInput.oninput = () => valStatic.textContent = staticInput.value + "%";
 
     /* ====== STATE ====== */
     let isRunning = false;
@@ -544,29 +524,6 @@
       scoreWrongEl.textContent = scoreWrong;
     }
 
-    // --- AUDIO: STATIC ---
-    function playStatic(duration, volume) {
-      if (volume <= 0) return;
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-
-      const bufferSize = audioCtx.sampleRate * duration;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-
-      const noiseSource = audioCtx.createBufferSource();
-      noiseSource.buffer = buffer;
-      const gainNode = audioCtx.createGain();
-      gainNode.gain.value = (volume / 100) * 0.25; 
-
-      noiseSource.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      noiseSource.start();
-    }
-
     // --- AUDIO: SPEECH ---
     function speakLetter(text) {
       if (synth.speaking) synth.cancel();
@@ -574,7 +531,7 @@
       const utterThis = new SpeechSynthesisUtterance(text);
       utterThis.rate = calculatedVoiceRate;
       utterThis.pitch = 1.0;
-      utterThis.volume = parseFloat(voiceVolInput.value);
+      utterThis.volume = 1.0; // Hardcoded volume
 
       const selectedOption = voiceSelect.selectedOptions[0];
       if(selectedOption) {
@@ -613,7 +570,6 @@
 
       maxTrials = parseInt(trialsInput.value); 
       flashDurationMs = parseInt(flashDurInput.value);
-      noiseVolume = parseInt(staticInput.value);
       gridSize = parseInt(gridInput.value); 
 
       const maxAllowedFlash = cycleTimeMs * 0.6;
@@ -635,7 +591,6 @@
       scoreWrong = 0;
       updateScoreUI();
 
-      if (audioCtx.state === 'suspended') audioCtx.resume();
       runNextTrial();
     }
 
@@ -667,7 +622,6 @@
       gridInput.disabled = disabled;
       lettersInput.disabled = disabled;
       flashDurInput.disabled = disabled;
-      staticInput.disabled = disabled;
       voiceSelect.disabled = disabled;
       matchBtn.disabled = !disabled;
     }
@@ -721,7 +675,6 @@
       activeCell.style.boxShadow = `0 0 20px rgba(251, 146, 60, 0.6)`;
 
       speakLetter(letter);
-      if (noiseVolume > 0) playStatic(flashDurationMs/1000, noiseVolume);
 
       timerId = setTimeout(() => {
         clearGrid(); 
