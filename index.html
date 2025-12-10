@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Gustav does the N-Back</title>
+  <title>N-Back (Gustav Only) 🪿</title>
   <style>
     /* --- CSS STYLES --- */
     body {
@@ -14,16 +13,15 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      min-height: 100vh; /* changed from height to min-height for safety */
+      height: 100vh;
       margin: 0;
       padding: 10px;
-      overflow-x: hidden; /* Prevent horizontal scroll */
+      overflow: hidden; 
       user-select: none;
-      -webkit-tap-highlight-color: transparent; /* Remove blue tap box on mobile */
     }
 
     h1 {
-      margin: 0.5rem 0;
+      margin: 0.2rem 0;
       text-align: center;
       color: #60a5fa;
       font-size: 1.5rem;
@@ -35,30 +33,28 @@
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      max-width: 600px; /* Slightly narrower max-width for better vertical stacking */
+      max-width: 800px;
       width: 100%;
+      height: 100%;
     }
 
     /* --- STATS BAR --- */
     #status-bar {
       display: flex;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
       font-size: 0.9rem;
       font-weight: bold;
       flex-wrap: wrap;
-      width: 100%;
     }
 
     .status-pill {
-      padding: 6px 10px;
+      padding: 6px 12px;
       border-radius: 8px;
       background: #111;
       border: 1px solid #222;
-      flex: 1 1 auto; /* Grow to fill space on mobile */
-      min-width: 60px;
+      min-width: 70px;
       text-align: center;
-      white-space: nowrap;
     }
 
     .text-orange { color: #fb923c; }
@@ -83,7 +79,7 @@
       justify-content: center;
       align-items: flex-end; 
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 15px;
     }
 
     .setting-group {
@@ -101,19 +97,19 @@
       background: #18181b;
       color: #60a5fa;
       border: 1px solid #333;
-      padding: 8px; /* Larger touch target */
+      padding: 5px 8px;
       border-radius: 6px;
       text-align: center;
       font-weight: bold;
-      font-size: 1rem; /* readable font size prevents auto-zoom on iOS */
+      font-size: 0.9rem;
       outline: none;
       cursor: pointer;
     }
     
-    input[type="text"] { width: 100%; max-width: 180px; text-transform: uppercase; }
-    input[type="number"] { width: 60px; }
+    input[type="text"] { width: 180px; text-transform: uppercase; }
+    input[type="number"] { width: 50px; }
     select { min-width: 80px; }
-    input[type="range"] { width: 100%; max-width: 200px; accent-color: #60a5fa; cursor: pointer; height: 20px; }
+    input[type="range"] { width: 90px; accent-color: #60a5fa; cursor: pointer; }
 
     .val-display {
       font-size: 0.75rem;
@@ -122,16 +118,12 @@
       margin-top: 2px;
     }
 
-    /* --- RESPONSIVE GRID --- */
+    /* --- THE GRID --- */
     #grid {
       display: grid;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 5px;
       position: relative;
-      /* FIX 2: Dynamic Sizing */
-      width: 100%;          /* Fill container width */
-      max-width: 380px;     /* Don't get too huge on desktop */
-      aspect-ratio: 1 / 1;  /* Force it to be a square */
     }
 
     .cell {
@@ -142,8 +134,6 @@
       align-items: center;
       justify-content: center;
       transition: border-color 0.1s;
-      width: 100%;  /* Fill the grid track */
-      height: 100%; /* Fill the grid track */
     }
 
     .cell.active {
@@ -152,13 +142,12 @@
       border-color: #fdba74;
     }
 
-    /* --- FLASH CONTROL --- */
+    /* --- FLASH CONTROL (Replaced Volume) --- */
     #flash-control {
         display: flex;
         flex-direction: column;
         align-items: center;
         margin-top: 5px;
-        width: 100%;
     }
     #flash-control label { font-size: 0.7rem; color: #555; margin-bottom: 2px; }
 
@@ -172,9 +161,8 @@
     #match-btn {
         background: #fb923c; 
         color: #000;
-        width: 100%;
-        max-width: 280px; /* Nice wide button on mobile */
-        height: 60px;
+        width: 180px;
+        height: 55px;
         font-size: 1.4rem;
         font-weight: 900;
         border: none;
@@ -182,7 +170,6 @@
         box-shadow: 0 4px #c2410c;
         transition: transform 0.1s, box-shadow 0.1s;
         cursor: pointer;
-        -webkit-user-select: none; /* prevent long-press text selection */
     }
     #match-btn:active {
         transform: translateY(4px);
@@ -206,8 +193,8 @@
     button.ctrl-btn {
       border: none;
       border-radius: 8px;
-      padding: 12px 24px;
-      font-size: 1rem;
+      padding: 10px 24px;
+      font-size: 0.9rem;
       cursor: pointer;
       font-weight: 700;
       transition: transform 0.1s;
@@ -230,8 +217,7 @@
     }
 
     #instructions {
-      margin-top: 10px;
-      margin-bottom: 20px;
+      margin-top: 5px;
       color: #555;
       font-size: 0.8rem;
       text-align: center;
@@ -240,8 +226,10 @@
 
     /* --- GUSTAV THE GOOSE --- */
     #gustav-wrapper {
-        margin-top: 30px; 
-        margin-bottom: 10px;
+        /* FIX: Increased top margin to 40px to prevent overlap with Flash slider */
+        margin-top: 40px; 
+        
+        margin-bottom: 5px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -249,13 +237,16 @@
     }
     
     #gustav-img {
-        width: 140px; /* Reduced slightly so it fits better on small screens */
+        width: 80px; 
         height: auto;
         transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         cursor: help; 
     }
 
-    #gustav-img:hover { transform: rotate(-10deg) scale(1.1); }
+    #gustav-img:hover {
+        transform: rotate(-10deg) scale(1.1);
+    }
+    
     #gustav-img.shake { animation: shake 0.4s ease-in-out; }
     #gustav-img.bounce { animation: bounce 0.4s ease-in-out; }
 
@@ -271,7 +262,11 @@
         pointer-events: none;
     }
     
-    #gustav-wrapper:hover .honk-text { opacity: 1; transform: translateY(-5px); }
+    #gustav-wrapper:hover .honk-text {
+        opacity: 1;
+        transform: translateY(-5px);
+    }
+    
     .honk-text.show { opacity: 1; transform: translateY(-10px); }
     .honk-text.bad { color: #fb923c; } 
     .honk-text.good { color: #60a5fa; } 
@@ -281,6 +276,7 @@
       25% { transform: translateX(-5px) rotate(-10deg); }
       75% { transform: translateX(5px) rotate(10deg); }
     }
+    
     @keyframes bounce {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-15px) scale(1.1); }
@@ -351,7 +347,7 @@
     
     <div id="flash-control">
         <label>Flash Time</label>
-        <input type="range" id="flash-duration" min="20" max="1500" step="10" value="800">
+        <input type="range" id="flash-duration" min="20" max="1500" step="10" value="800" style="width:120px;">
         <span class="val-display" id="val-flash">800 ms</span>
     </div>
 
@@ -382,9 +378,9 @@
     /* ====== CONFIG ====== */
     let activeLetters = []; 
     let nValue = 2; 
-    let cycleTimeMs = 1500; 
+    let cycleTimeMs = 1500; // Default matches HTML select
     let flashDurationMs = 800;
-    let maxTrials = 75; 
+    let maxTrials = 75; // Default matches HTML input
     let gridSize = 3;
     let calculatedVoiceRate = 1.0; 
 
@@ -402,6 +398,7 @@
     const lastResultEl = document.getElementById('last-result');
     const matchBtn = document.getElementById('match-btn'); 
     
+    // Flash Time (Moved)
     const flashDurInput = document.getElementById('flash-duration');
     const valFlash = document.getElementById('val-flash');
 
@@ -412,6 +409,7 @@
     const lettersInput = document.getElementById('letters-setting');
     const voiceSelect = document.getElementById('voice-select');
     
+    // Gustav
     const gustavImg = document.getElementById('gustav-img');
     const gustavMsg = document.getElementById('gustav-msg');
 
@@ -425,12 +423,13 @@
           return 0;
       });
       
+      // FILTER: Only English AND Remove 'Google' voices
       const filteredVoices = voices.filter(v => 
           v.lang.startsWith('en') && !v.name.includes('Google')
       );
       
       voiceSelect.innerHTML = '';
-      const displayVoices = filteredVoices.length > 0 ? filteredVoices : voices; 
+      const displayVoices = filteredVoices.length > 0 ? filteredVoices : voices; // Fallback if list empty
 
       displayVoices.forEach((voice) => {
         const option = document.createElement('option');
@@ -485,21 +484,25 @@
         }, 1000);
     }
 
-    /* ====== GRID BUILDER (UPDATED FOR CSS RESPONSIVENESS) ====== */
+    /* ====== GRID BUILDER ====== */
     function buildGrid(size) {
       gridEl.innerHTML = ''; 
       cells = [];
       
-      // FIX 3: Use Fractional Units (1fr) so CSS handles sizing
-      gridEl.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-      gridEl.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+      let cellSize = 85; 
+      if (size === 4) cellSize = 65;
+      if (size === 5) cellSize = 50;
+
+      gridEl.style.gridTemplateColumns = `repeat(${size}, ${cellSize}px)`;
+      gridEl.style.gridTemplateRows = `repeat(${size}, ${cellSize}px)`;
       
       const totalCells = size * size;
 
       for (let i = 0; i < totalCells; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
-        // Note: No fixed width/height set here anymore
+        cell.style.width = `${cellSize}px`;
+        cell.style.height = `${cellSize}px`;
         gridEl.appendChild(cell);
         cells.push(cell);
       }
@@ -521,13 +524,14 @@
       scoreWrongEl.textContent = scoreWrong;
     }
 
+    // --- AUDIO: SPEECH ---
     function speakLetter(text) {
       if (synth.speaking) synth.cancel();
       
       const utterThis = new SpeechSynthesisUtterance(text);
       utterThis.rate = calculatedVoiceRate;
       utterThis.pitch = 1.0;
-      utterThis.volume = 1.0; 
+      utterThis.volume = 1.0; // Hardcoded volume
 
       const selectedOption = voiceSelect.selectedOptions[0];
       if(selectedOption) {
@@ -628,9 +632,11 @@
 
         if (currentStimulus.isMatch) {
           scoreCorrect++;
+          // NO FLASH
           showGustav("Good Job!", "good");
         } else {
           scoreWrong++;
+          // NO FLASH
           showGustav("HONK!", "bad");
         }
         updateScoreUI();
