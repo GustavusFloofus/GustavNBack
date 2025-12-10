@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>N-Back (Gustav Only) 🪿</title>
   <style>
     /* --- CSS STYLES --- */
@@ -18,6 +19,7 @@
       padding: 10px;
       overflow: hidden; 
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     h1 {
@@ -142,7 +144,7 @@
       border-color: #fdba74;
     }
 
-    /* --- FLASH CONTROL (Replaced Volume) --- */
+    /* --- FLASH CONTROL --- */
     #flash-control {
         display: flex;
         flex-direction: column;
@@ -170,6 +172,7 @@
         box-shadow: 0 4px #c2410c;
         transition: transform 0.1s, box-shadow 0.1s;
         cursor: pointer;
+        -webkit-user-select: none;
     }
     #match-btn:active {
         transform: translateY(4px);
@@ -226,9 +229,7 @@
 
     /* --- GUSTAV THE GOOSE --- */
     #gustav-wrapper {
-        /* FIX: Increased top margin to 40px to prevent overlap with Flash slider */
         margin-top: 40px; 
-        
         margin-bottom: 5px;
         display: flex;
         flex-direction: column;
@@ -378,9 +379,9 @@
     /* ====== CONFIG ====== */
     let activeLetters = []; 
     let nValue = 2; 
-    let cycleTimeMs = 1500; // Default matches HTML select
+    let cycleTimeMs = 1500; 
     let flashDurationMs = 800;
-    let maxTrials = 75; // Default matches HTML input
+    let maxTrials = 75; 
     let gridSize = 3;
     let calculatedVoiceRate = 1.0; 
 
@@ -398,7 +399,6 @@
     const lastResultEl = document.getElementById('last-result');
     const matchBtn = document.getElementById('match-btn'); 
     
-    // Flash Time (Moved)
     const flashDurInput = document.getElementById('flash-duration');
     const valFlash = document.getElementById('val-flash');
 
@@ -413,7 +413,7 @@
     const gustavImg = document.getElementById('gustav-img');
     const gustavMsg = document.getElementById('gustav-msg');
 
-    /* ====== VOICE LOADER (NO GOOGLE) ====== */
+    /* ====== VOICE LOADER (MOBILE FIX) ====== */
     function populateVoiceList() {
       voices = synth.getVoices().sort((a, b) => {
           const aname = a.name.toUpperCase();
@@ -423,13 +423,20 @@
           return 0;
       });
       
-      // FILTER: Only English AND Remove 'Google' voices
-      const filteredVoices = voices.filter(v => 
+      // ATTEMPT TO FILTER: Only English AND Remove 'Google'
+      let filteredVoices = voices.filter(v => 
           v.lang.startsWith('en') && !v.name.includes('Google')
       );
       
+      // SAFETY CHECK: If filtering removed ALL voices (common on Android), 
+      // put the English ones back, even if they are Google.
+      if (filteredVoices.length === 0) {
+          filteredVoices = voices.filter(v => v.lang.startsWith('en'));
+      }
+      
       voiceSelect.innerHTML = '';
-      const displayVoices = filteredVoices.length > 0 ? filteredVoices : voices; // Fallback if list empty
+      // Final Fallback: If still empty, use whatever we have
+      const displayVoices = filteredVoices.length > 0 ? filteredVoices : voices; 
 
       displayVoices.forEach((voice) => {
         const option = document.createElement('option');
@@ -442,6 +449,7 @@
     if (speechSynthesis.onvoiceschanged !== undefined) {
       speechSynthesis.onvoiceschanged = populateVoiceList;
     }
+    // Try immediate load
     populateVoiceList();
 
     /* ====== UI HANDLERS ====== */
@@ -531,7 +539,7 @@
       const utterThis = new SpeechSynthesisUtterance(text);
       utterThis.rate = calculatedVoiceRate;
       utterThis.pitch = 1.0;
-      utterThis.volume = 1.0; // Hardcoded volume
+      utterThis.volume = 1.0; // Ensure volume is max
 
       const selectedOption = voiceSelect.selectedOptions[0];
       if(selectedOption) {
@@ -562,6 +570,14 @@
     /* ====== GAME LOGIC ====== */
     function startSession() {
       if (isRunning) return;
+      
+      // === MOBILE AUDIO UNLOCKER ===
+      // This plays a silent sound immediately on click to wake up the engine
+      // Required for iOS and some Androids
+      const primer = new SpeechSynthesisUtterance('');
+      primer.volume = 0; 
+      synth.speak(primer);
+      // =============================
 
       nValue = parseInt(nInput.value);
       let cycleS = parseFloat(speedSelect.value);
